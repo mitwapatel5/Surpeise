@@ -29,12 +29,10 @@
     background: radial-gradient(circle at 20% 15%, #5a1830 0%, var(--wine) 45%, #260812 100%);
     color: var(--cream);
     min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-    padding: 24px;
-  }
+    padding:24px;
+    overflow-y:auto;      /* Allow scrolling */
+    display:block;        /* Remove vertical centering */
+}
 
   /* ambient floating hearts */
   #hearts{
@@ -59,13 +57,12 @@
     100%{ transform: translateY(-110vh) translateX(var(--drift,20px)) rotate(360deg); opacity:0; }
   }
 
-  .stage{
-    position:relative;
-    z-index:2;
+ .stage{
     width:100%;
-    max-width: 480px;
+    max-width:480px;
+    margin:40px auto;     /* Center horizontally with space top & bottom */
     text-align:center;
-  }
+}
 
   .screen{
     display:none;
