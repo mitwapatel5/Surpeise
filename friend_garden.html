@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>a little garden</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500;1,600&family=Quicksand:wght@400;500;600;700&display=swap');
+
+  :root {
+    --sky-top: #ff9466;
+    --sky-mid: #d16bd9;
+    --sky-low: #4fd1b8;
+    --ground: #4fae52;
+    --ground-dark: #2d7a3a;
+    --ink: #3a2a45;
+    --ink-soft: #5e4569;
+    --gold: #ffca3a;
+    --card-bg: rgba(255,255,255,0.6);
+    --card-border: rgba(255,255,255,0.85);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+
+  body {
+    background: linear-gradient(180deg, var(--sky-top) 0%, #ff6f9c 22%, var(--sky-mid) 48%, #5bb8d6 72%, var(--sky-low) 100%);
+    font-family: 'Quicksand', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 34px 22px 0;
+    position: relative;
+  }
+
+  .sun {
+    position: fixed;
+    top: -60px;
+    right: -40px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,202,58,0.75), rgba(255,202,58,0) 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .stage {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    margin: auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 26px;
+    text-align: center;
+    padding-bottom: 30px;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    opacity: 0.75;
+  }
+
+  .headline {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+
+  .sub {
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    max-width: 340px;
+  }
+
+  /* ---------- MESSAGE CARD ---------- */
+  .message-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(6px);
+    border-radius: 18px;
+    padding: 22px 22px;
+    width: 100%;
+    max-width: 380px;
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(90, 70, 50, 0.08);
+  }
+
+  .message-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ink);
+    transition: opacity 0.4s ease;
+  }
+
+  .progress {
+    font-size: 12.5px;
+    letter-spacing: 0.5px;
+    color: var(--ink-soft);
+    opacity: 0.75;
+  }
+
+  /* ---------- GARDEN ---------- */
+  .garden {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 8px;
+    height: 170px;
+  }
+
+  .flower-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .flower-head {
+    position: relative;
+    width: 54px;
+    height: 54px;
+    margin-bottom: -6px;
+  }
+
+  .petal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 15px;
+    height: 21px;
+    margin: -11px 0 0 -7.5px;
+    background: var(--petal-color, #ff9e80);
+    border-radius: 50%;
+    transform: rotate(var(--deg)) translateY(-13px) scale(0);
+    opacity: 0;
+    transition: transform 0.55s cubic-bezier(.34,1.56,.64,1), opacity 0.35s ease;
+    transition-delay: var(--delay, 0s);
+  }
+
+  .flower-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 13px;
+    height: 13px;
+    margin: -6.5px 0 0 -6.5px;
+    background: var(--gold);
+    border-radius: 50%;
+    z-index: 2;
+    transform: scale(0);
+    transition: transform 0.4s ease 0.45s;
+    box-shadow: 0 0 10px rgba(238,180,62,0.5);
+  }
+
+  .bud {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 11px;
+    height: 15px;
+    margin: -9px 0 0 -5.5px;
+    background: var(--ground-dark);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    animation: swayBud 3.2s ease-in-out infinite;
+  }
+
+  @keyframes swayBud {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+
+  .flower-wrap.bloomed .bud {
+    opacity: 0;
+    transform: scale(0);
+  }
+  .flower-wrap.bloomed .petal {
+    transform: rotate(var(--deg)) translateY(-13px) scale(1);
+    opacity: 1;
+  }
+  .flower-wrap.bloomed .flower-center {
+    transform: scale(1);
+  }
+
+  .stem {
+    width: 3px;
+    background: var(--ground-dark);
+    border-radius: 2px;
+    transition: height 0.4s ease;
+  }
+
+  .ground {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    height: 34px;
+    background: var(--ground);
+    clip-path: polygon(0% 100%,0% 35%,4% 0%,8% 35%,12% 0%,16% 35%,20% 0%,24% 35%,28% 0%,32% 35%,36% 0%,40% 35%,44% 0%,48% 35%,52% 0%,56% 35%,60% 0%,64% 35%,68% 0%,72% 35%,76% 0%,80% 35%,84% 0%,88% 35%,92% 0%,96% 35%,100% 0%,100% 100%);
+  }
+
+  .hint {
+    font-size: 13px;
+    color: var(--ink-soft);
+    opacity: 0.65;
+  }
+  .hint span {
+    display: inline-block;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+  }
+
+  /* ---------- CLOSING ---------- */
+  .closing {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    animation: rise 0.6s ease both;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .closing .headline { font-size: 24px; }
+
+  .closing p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    max-width: 330px;
+  }
+
+  .signature {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--gold);
+    margin-top: 2px;
+  }
+
+  .butterfly {
+    position: fixed;
+    font-size: 20px;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 2;
+    animation: flutter 7s ease-in-out infinite;
+  }
+  @keyframes flutter {
+    0%   { transform: translate(0,0) rotate(0deg); opacity: 0; }
+    8%   { opacity: 0.8; }
+    25%  { transform: translate(-30px,-40px) rotate(-10deg); }
+    50%  { transform: translate(20px,-70px) rotate(8deg); }
+    75%  { transform: translate(-15px,-100px) rotate(-6deg); }
+    92%  { opacity: 0.6; }
+    100% { transform: translate(10px,-140px) rotate(4deg); opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bud, .hint span, .butterfly, .petal, .flower-center {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .headline { font-size: 25px; }
+    .flower-head { width: 46px; height: 46px; }
+    .garden { padding: 0 2px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sun"></div>
+
+<div class="stage">
+
+  <div>
+    <div class="eyebrow">a little garden, just for you</div>
+    <div class="headline" style="margin-top: 8px;">Something small<br>to grow today.</div>
+    <p class="sub" style="margin-top: 12px;">Five little buds, waiting on you. Tap each one whenever you're ready — no rush, no order.</p>
+  </div>
+
+  <div id="mainSection" style="display:flex; flex-direction:column; align-items:center; gap:22px; width:100%;">
+    <div class="message-card">
+      <p class="message-text" id="messageText">Tap a bud below to see what grows.</p>
+    </div>
+
+    <div style="width:100%;">
+      <div class="garden" id="garden"></div>
+      <div class="ground"></div>
+    </div>
+
+    <p class="progress" id="progress">0 of 5 blooming</p>
+    <p class="hint"><span>tap the little buds ↑</span></p>
+  </div>
+
+  <div class="closing" id="closing">
+    <div class="headline">Your whole garden<br>is blooming.</div>
+    <p>So are you — even on the hard days, even when it doesn't feel like it. Growing isn't always loud or fast, and neither is healing.</p>
+    <p class="signature">I'm proud of you. 🤍</p>
+  </div>
+
+</div>
+
+<script>
+  const flowers = [
+    {
+      color: '#ff5e3a',
+      msg: "One thing at a time. That's all today needs from you."
+    },
+    {
+      color: '#a64bf4',
+      msg: "You've made it through every overwhelming day so far. This one's no different."
+    },
+    {
+      color: '#ff3d78',
+      msg: "It's okay to put it down for a minute. It'll still be there, and so will you."
+    },
+    {
+      color: '#ffcc29',
+      msg: "You're allowed to grow at your own pace, even today."
+    },
+    {
+      color: '#29b6f6',
+      msg: "Look — you made something beautiful, just by showing up."
+    }
+  ];
+
+  const garden = document.getElementById('garden');
+  const messageText = document.getElementById('messageText');
+  const progress = document.getElementById('progress');
+  const closing = document.getElementById('closing');
+  const mainSection = document.getElementById('mainSection');
+  let bloomedCount = 0;
+
+  flowers.forEach((f, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'flower-wrap';
+    wrap.setAttribute('role', 'button');
+    wrap.setAttribute('tabindex', '0');
+    wrap.setAttribute('aria-label', 'Tap to bloom a flower');
+
+    const head = document.createElement('div');
+    head.className = 'flower-head';
+
+    for (let p = 0; p < 6; p++) {
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      petal.style.setProperty('--deg', (p * 60) + 'deg');
+      petal.style.setProperty('--petal-color', f.color);
+      petal.style.setProperty('--delay', (p * 0.03) + 's');
+      head.appendChild(petal);
+    }
+    const center = document.createElement('div');
+    center.className = 'flower-center';
+    head.appendChild(center);
+
+    const bud = document.createElement('div');
+    bud.className = 'bud';
+    bud.style.animationDelay = (i * 0.3) + 's';
+    head.appendChild(bud);
+
+    const stem = document.createElement('div');
+    stem.className = 'stem';
+    stem.style.height = (40 + (i % 3) * 14) + 'px';
+
+    wrap.appendChild(head);
+    wrap.appendChild(stem);
+
+    function bloom() {
+      if (wrap.classList.contains('bloomed')) {
+        // re-show its message even if already bloomed
+        showMessage(f.msg);
+        return;
+      }
+      wrap.classList.add('bloomed');
+      bloomedCount++;
+      showMessage(f.msg);
+      progress.textContent = bloomedCount + ' of 5 blooming';
+      spawnButterfly(wrap);
+      if (bloomedCount === flowers.length) {
+        setTimeout(() => {
+          mainSection.style.display = 'none';
+          closing.style.display = 'flex';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 900);
+      }
+    }
+
+    wrap.addEventListener('click', bloom);
+    wrap.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') bloom();
+    });
+
+    garden.appendChild(wrap);
+  });
+
+  function showMessage(msg) {
+    messageText.style.opacity = 0;
+    setTimeout(() => {
+      messageText.textContent = msg;
+      messageText.style.opacity = 1;
+    }, 220);
+  }
+
+  function spawnButterfly(el) {
+    const rect = el.getBoundingClientRect();
+    const b = document.createElement('div');
+    b.className = 'butterfly';
+    b.textContent = '🦋';
+    b.style.left = (rect.left + rect.width / 2) + 'px';
+    b.style.top = (rect.top) + 'px';
+    document.body.appendChild(b);
+    setTimeout(() => b.remove(), 7200);
+  }
+</script>
+
+</body>
+</html>
